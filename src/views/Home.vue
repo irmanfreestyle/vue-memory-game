@@ -2,27 +2,29 @@
     <div class="container">    
       <div class="start-time" v-if="startTime > 0">{{startTime}}</div>
       <div class="start-time" v-if="startTime === 0">
-        {{minutes}}:{{seconds}}:{{miliseconds}}
+        {{minutes | addZero}}:{{seconds | addZero}}:{{miliseconds}}
       </div>
       <div class="flex-item" v-for="(image, key) in images" :key="key">
         <div @click="clicking({ id: image.id, index: key })">
           <Card :image="image" :clicked="image.clicked" />
         </div>
       </div>
+      <Cover />
     </div>  
 </template>
 
 <script>
 import Card from "@/components/Card.vue";
+import Cover from '@/components/Cover.vue'
+import { mapMutations } from 'vuex'
 
 export default {
-  components: { Card },
+  components: { Card, Cover },
   data() {
     return {
       clicked: 0,
       match: [],
-      sameClick: [],
-      finish: false,
+      sameClick: [],      
       startTime: 3,
       seconds: 0,
       minutes: 0,
@@ -91,80 +93,110 @@ export default {
       ]
     };
   },
-  methods: {        
-    clicking(data) {      
-      this.sameClick.push(data.index)   
+  watch: {
+    start(val) {
+      if(val) {
+        this.starting()
+      }
+    }
+  },
+  methods: {
+    ...mapMutations(['toggleStart', 'setFinishTime']),
+    clicking(data) {
+      this.sameClick.push(data.index);
       if (this.clicked !== 2 && !this.images[data.index].clicked) {
-        this.images[data.index].clicked = true
-        let self = this
+        this.images[data.index].clicked = true;
+        let self = this;
         this.match.push(data.id);
-        this.clicked++;        
-        if (this.clicked === 2) {          
+        this.clicked++;
+        if (this.clicked === 2) {
           setTimeout(() => {
             if (self.match[0] === self.match[1]) {
-              console.log("Correct");              
+              console.log("Correct");
+              self.checkFinish()
             } else {
-              console.log("Wrong");              
-              self.removeCover(self.match)
+              console.log("Wrong");
+              self.removeCover(self.match);
             }
             console.log("state was restarted");
             self.match = [];
-            self.sameClick = []
-            self.clicked = 0;     
-            this.checkFinish()       
-          }, 1000);
-        }        
-      }        
+            self.sameClick = [];
+            self.clicked = 0;
+          }, 500);
+        }
+      }
+    },
+    checkFinish() {
+      let finish = true
+      this.images.forEach(image => {
+        if(image.clicked === false) finish = false
+      })
+      if(finish) {        
+        let time = Object.assign({}, {
+          minutes: this.minutes,
+          seconds: this.seconds
+        })
+        this.setFinishTime(time)
+        this.toggleStart()
+      }
     },
     removeCover(match) {
       match.forEach(m => {
         this.images.forEach((image, index) => {
           if(m === image.id) {
-            this.images[index].clicked = false
+            this.images[index].clicked = false;
           }
         })
-      })
-    },
-    checkFinish() {
-      
+      });
     },
     starting() {
-      let self = this
-      let timer = setInterval(() => {
-        console.log('timer')
-        this.startTime--
+      let self = this;
+      let timer = setInterval(() => {  //STOP THIS INTERVAL LATER...PLEASE!!!
+        this.startTime--;
         if(self.startTime === 0) {
-          clearInterval(timer)
-          self.startTimer()
-          self.toggleOpen()
+          clearInterval(timer);
+          self.startTimer();
+          self.toggleOpen();
         }
-      }, 1500)
-    },    
-    toggleOpen() {
-      this.images.forEach(image => image.clicked = !image.clicked)
+      }, 1500);
     },
-    startTimer() {      
-      let self = this      
+    toggleOpen() {
+      this.images.forEach(image => image.clicked = !image.clicked);
+    },
+    startTimer() {
+      let self = this;
       setInterval(() => {
-        self.seconds++
-        if(self.seconds >= 61) {
-          self.seconds = 0
-          self.minutes++
-        }        
-      }, 1000)      
-      setInterval(() => {
-        self.miliseconds++
-        if(self.miliseconds >= 60) {
-          self.miliseconds = 0
+        self.seconds++;
+        if(self.seconds === 60) {
+          self.seconds = 0;
+          self.minutes++;
         }
-        if(self.miliseconds < 10) self.miliseconds = 0 + '' + self.miliseconds        
-      }, 15)
+      }, 1000);
+      setInterval(() => {
+        self.miliseconds++;
+        if( self.miliseconds >= 60 ) {
+          self.miliseconds = 0;
+        }
+        if (self.miliseconds < 10) self.miliseconds = 0 + "" + self.miliseconds;
+      }, 15);
     }
-  },  
-  created() {    
+  },
+  filters: {
+    addZero(number) {
+      if(number.toString().split('').length < 2) {
+        return `0${number}`
+      }
+      return number
+    }
+  },
+  computed: {
+    start() {
+      return this.$store.state.start
+    }
+  },
+  created() {
     this.images.sort(() => Math.random() - 0.5);
-    this.toggleOpen()    
-    this.starting()    
+    this.toggleOpen();
   }
 };
 </script>
@@ -184,7 +216,7 @@ export default {
 .container {
   width: 500px;
   display: flex;
-  flex-wrap: wrap;    
+  flex-wrap: wrap;
 }
 .start-time {
   color: white;
@@ -192,9 +224,9 @@ export default {
   top: 0;
   font-size: 40px;
   display: flex;
-  justify-content: center;  
+  justify-content: center;
   width: 100%;
-  padding: 20px 0;  
+  padding: 20px 0;
   left: 0;
 }
 </style>
