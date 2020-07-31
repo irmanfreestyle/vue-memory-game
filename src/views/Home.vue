@@ -1,16 +1,12 @@
-<template>      
-    <div class="container">    
-      <div class="start-time" v-if="startTime > 0">{{startTime}}</div>
-      <div class="start-time" v-if="startTime === 0">
-        {{minutes | addZero}}:{{seconds | addZero}}:{{miliseconds}}
-      </div>
+<template>
+    <div class="container">
       <div class="flex-item" v-for="(image, key) in images" :key="key">
         <div @click="clicking({ id: image.id, index: key })">
           <Card :image="image" :clicked="image.clicked" />
         </div>
       </div>
       <Cover />
-    </div>  
+    </div>
 </template>
 
 <script>
@@ -24,11 +20,8 @@ export default {
     return {
       clicked: 0,
       match: [],
-      sameClick: [],      
+      sameClick: [],
       startTime: 3,
-      seconds: 0,
-      minutes: 0,
-      miliseconds: 0,
       images: [
         {
           id: 1,
@@ -101,7 +94,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['toggleStart', 'setFinishTime']),
+    ...mapMutations(['toggleStart']),
     clicking(data) {
       this.sameClick.push(data.index);
       if (this.clicked !== 2 && !this.images[data.index].clicked) {
@@ -131,12 +124,7 @@ export default {
       this.images.forEach(image => {
         if(image.clicked === false) finish = false
       })
-      if(finish) {        
-        let time = Object.assign({}, {
-          minutes: this.minutes,
-          seconds: this.seconds
-        })
-        this.setFinishTime(time)
+      if(finish) {
         this.toggleStart()
       }
     },
@@ -155,7 +143,6 @@ export default {
         this.startTime--;
         if(self.startTime === 0) {
           clearInterval(timer);
-          self.startTimer();
           self.toggleOpen();
         }
       }, 1500);
@@ -163,23 +150,6 @@ export default {
     toggleOpen() {
       this.images.forEach(image => image.clicked = !image.clicked);
     },
-    startTimer() {
-      let self = this;
-      setInterval(() => {
-        self.seconds++;
-        if(self.seconds === 60) {
-          self.seconds = 0;
-          self.minutes++;
-        }
-      }, 1000);
-      setInterval(() => {
-        self.miliseconds++;
-        if( self.miliseconds >= 60 ) {
-          self.miliseconds = 0;
-        }
-        if (self.miliseconds < 10) self.miliseconds = 0 + "" + self.miliseconds;
-      }, 15);
-    }
   },
   filters: {
     addZero(number) {

@@ -9,15 +9,11 @@ export default new Vuex.Store({
     match: [],
     sameClick: [],
     start: false,
-    finishTime: null
   },
   mutations: {
     toggleStart(state) {
       state.start = !state.start
     },
-    setFinishTime(state, payload) {
-      state.finishTime = payload
-    }
   },
   actions: {},
   modules: {}

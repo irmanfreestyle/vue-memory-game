@@ -1,8 +1,7 @@
 <template>
     <div class="cover" ref="cover" :class="{open:start}">
-        <h2 v-if="this.finishTime !== null" style="color:white">{{finishTime.minutes}} Minute {{finishTime.seconds}} Second</h2>
         <button @click="startGame()">START GAME</button>
-    </div>    
+    </div>
 </template>
 
 <script>
@@ -18,9 +17,6 @@ export default {
     computed: {
         start() {
             return this.$store.state.start
-        },
-        finishTime() {
-            return this.$store.state.finishTime
         }
     }
 }
