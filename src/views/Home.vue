@@ -90,11 +90,12 @@ export default {
     start(val) {
       if(val) {
         this.starting()
+        this.countDown(true)
       }
     }
   },
   methods: {
-    ...mapMutations(['toggleStart']),
+    ...mapMutations(['toggleStart', 'showTimer', 'countDown']),
     clicking(data) {
       this.sameClick.push(data.index);
       if (this.clicked !== 2 && !this.images[data.index].clicked) {
@@ -105,13 +106,10 @@ export default {
         if (this.clicked === 2) {
           setTimeout(() => {
             if (self.match[0] === self.match[1]) {
-              console.log("Correct");
               self.checkFinish()
             } else {
-              console.log("Wrong");
               self.removeCover(self.match);
             }
-            console.log("state was restarted");
             self.match = [];
             self.sameClick = [];
             self.clicked = 0;
@@ -125,6 +123,9 @@ export default {
         if(image.clicked === false) finish = false
       })
       if(finish) {
+        console.log(this.minutes + ' Minutes ' + this.seconds + ' Seconds')
+        console.log('Save the timer to localstorage and show this as highest score')
+        this.showTimer(false)
         this.toggleStart()
       }
     },
@@ -149,19 +150,18 @@ export default {
     },
     toggleOpen() {
       this.images.forEach(image => image.clicked = !image.clicked);
+      if (this.startTime === 0) this.showTimer(true)
     },
-  },
-  filters: {
-    addZero(number) {
-      if(number.toString().split('').length < 2) {
-        return `0${number}`
-      }
-      return number
-    }
   },
   computed: {
     start() {
-      return this.$store.state.start
+      return this.$store.state.start;
+    },
+    minutes() {
+      return this.$store.state.minutes
+    },
+    seconds() {
+      return this.$store.state.seconds
     }
   },
   created() {

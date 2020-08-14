@@ -29,7 +29,7 @@ export default {
     }
 
     .open {
-        height: 0%!important;        
+        height: 0%!important;
     }
     .cover {
         overflow: hidden!important;
@@ -38,7 +38,7 @@ export default {
         position: absolute;
         left: 0;
         top: 0;
-        background: #7eb534;
+        background: #41B883;
         display: flex;
         flex-direction: column;
         align-items: center;
