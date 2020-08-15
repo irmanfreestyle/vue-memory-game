@@ -12,9 +12,19 @@ export default new Vuex.Store({
     timer: false,
     countDown: false,
     minutes: 0,
-    seconds: 0
+    seconds: 0,
+    highScoreAlert: false,
+    interval: null
   },
   mutations: {
+    stopInterval(state) {
+      clearInterval(state.interval)
+      state.minutes = 0
+      state.seconds = 0
+    },
+    setHighScoreAlert(state, payload) {
+      state.highScoreAlert = payload
+    },
     toggleStart(state) {
       state.start = !state.start
     },

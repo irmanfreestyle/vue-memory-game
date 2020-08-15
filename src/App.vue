@@ -2,6 +2,7 @@
   <div id="app">
     <Timer v-if="timer"></Timer>
     <CountDown v-if="count"></CountDown>
+    <NewHighScore v-if="highScore"></NewHighScore>
     <router-view />
   </div>
 </template>
@@ -9,12 +10,15 @@
 <script>
   import Timer from '@/components/Timer'
   import CountDown from '@/components/Countdown'
+  import NewHighScore from '@/components/NewHighScore'
+
   import { mapMutations } from 'vuex'
 
   export default {
     components: {
       Timer,
-      CountDown
+      CountDown,
+      NewHighScore
     },
     computed: {
       timer () {
@@ -22,6 +26,9 @@
       },
       count () {
         return this.$store.state.countDown
+      },
+      highScore () {
+        return this.$store.state.highScoreAlert
       }
     }
   }

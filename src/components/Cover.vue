@@ -1,13 +1,16 @@
 <template>
     <div class="cover" ref="cover" :class="{open:start}">
         <button @click="startGame()">START GAME</button>
+        <HighScore v-if="!start" />
     </div>
 </template>
 
 <script>
 import { mapMutations } from 'vuex'
+import HighScore from '@/components/HighScore'
 
 export default {
+    components: {HighScore},
     methods: {
         ...mapMutations(['toggleStart']),
         startGame() {
@@ -43,7 +46,7 @@ export default {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        transition: 0.3s;        
+        transition: 0.3s;
     }
     button {
         background: yellow;
@@ -51,7 +54,7 @@ export default {
         text-shadow: 1px 2px 4px rgba(0,0,0,0.3);
         font-size: 20px;
         padding: 10px 15px;
-        border-radius: 5px;        
+        border-radius: 5px;
         border: 0px;
         box-shadow: 1px 3px 10px rgba(0,0,0,0.3);
         transition: 0.3s;

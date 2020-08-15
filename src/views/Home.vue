@@ -89,13 +89,18 @@ export default {
   watch: {
     start(val) {
       if(val) {
-        this.starting()
         this.countDown(true)
+      }
+    },
+    justStart(val) {
+      if (!val) {
+        this.toggleOpen()
+        this.showTimer(true)
       }
     }
   },
   methods: {
-    ...mapMutations(['toggleStart', 'showTimer', 'countDown']),
+    ...mapMutations(['toggleStart', 'showTimer', 'countDown', 'setHighScoreAlert', 'stopInterval']),
     clicking(data) {
       this.sameClick.push(data.index);
       if (this.clicked !== 2 && !this.images[data.index].clicked) {
@@ -113,7 +118,7 @@ export default {
             self.match = [];
             self.sameClick = [];
             self.clicked = 0;
-          }, 500);
+          }, 300);
         }
       }
     },
@@ -123,10 +128,10 @@ export default {
         if(image.clicked === false) finish = false
       })
       if(finish) {
-        console.log(this.minutes + ' Minutes ' + this.seconds + ' Seconds')
-        console.log('Save the timer to localstorage and show this as highest score')
+        this.setToLocalStorage(this.minutes, this.seconds)
         this.showTimer(false)
         this.toggleStart()
+        this.stopInterval()
       }
     },
     removeCover(match) {
@@ -138,20 +143,23 @@ export default {
         })
       });
     },
-    starting() {
-      let self = this;
-      let timer = setInterval(() => {  //STOP THIS INTERVAL LATER...PLEASE!!!
-        this.startTime--;
-        if(self.startTime === 0) {
-          clearInterval(timer);
-          self.toggleOpen();
-        }
-      }, 1500);
-    },
     toggleOpen() {
       this.images.forEach(image => image.clicked = !image.clicked);
       if (this.startTime === 0) this.showTimer(true)
     },
+    setToLocalStorage(minutes, seconds) {
+      let storage = JSON.parse(localStorage.getItem('vue-game'));
+      let payload = {minutes, seconds}
+
+      if (!storage) {
+        localStorage.setItem('vue-game', JSON.stringify(payload))
+      } else {
+        if (minutes < payload.minutes || (minutes === storage.minutes && seconds < storage.seconds)) {
+          localStorage.setItem('vue-game', JSON.stringify(payload))
+          this.setHighScoreAlert(true)
+        }
+      }
+    }
   },
   computed: {
     start() {
@@ -162,6 +170,9 @@ export default {
     },
     seconds() {
       return this.$store.state.seconds
+    },
+    justStart() {
+      return this.$store.state.countDown
     }
   },
   created() {

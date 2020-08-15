@@ -11,20 +11,25 @@
 	export default {
 		methods: {
 			...mapMutations(['incrementTimer']),
-			start () {
-				setInterval (() => {
-					this.incrementTimer('s')
-					if (this.seconds === 60) {
-						this.incrementTimer(null)
-						this.incrementTimer('m')
-					}
-				}, 1000)
+		},
+		data () {
+			return {
+				trigger: 1
 			}
 		},
 		created () {
-			this.start()
+			this.$store.state.interval = setInterval(() => {
+				this.incrementTimer('s')
+				if (this.seconds === 60) {
+					this.incrementTimer(null)
+					this.incrementTimer('m')
+				}
+			}, 1000)
 		},
 		computed: {
+			start() {
+				return this.$store.state.start
+			},
 			seconds () {
 				return this.$store.state.seconds
 			},
